@@ -1,0 +1,35 @@
+{
+  "name": "rle-marching",
+  "version": "0.0.0",
+  "description": "Fast marching methods for sampling narrowband level sets",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "rle-core": "~0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/rle-marching.git"
+  },
+  "keywords": [
+    "rle",
+    "narrowband",
+    "marching",
+    "sampling",
+    "adaptive",
+    "solid",
+    "3d",
+    "geometry",
+    "multiphase"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "BSD",
+  "gitHead": "51b8455bfe95a3b9c834de598c11b9160a333ecd",
+  "readmeFilename": "README.md"
+}
