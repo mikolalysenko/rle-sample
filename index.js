@@ -4,15 +4,45 @@ var core = require("rle-core");
 
 var DEFAULT_DIST_FUNC = new Function("return 1.0");
 
-var inSolid = new Function("dist_func", "x", "return dist_func(x) <= 0 ? 1 : 0;");
-
-function makeSolid(dist_func) {
-  return inSolid.bind(null, dist_func);
+//Sample a volume densely
+function sampleDense(lo, hi, phase_func, dist_func) {
+  //If no distance function is present, just assume boundary distance is constant
+  if(!dist_func) {
+    dist_func = DEFAULT_DIST_FUNC;
+  }
+  var builder = new core.DynamicVolume()
+    , x       = new Int32Array(3)
+    , y       = new Int32Array(3);
+  //March over the range at integer increments
+  for(x[2]=lo[2]; x[2]<hi[2]; ++x[2]) {
+    for(x[1]=lo[1]; x[1]<hi[1]; ++x[1]) {
+      for(x[0]=lo[0]; x[0]<hi[0]; ++x[0]) {
+        //Check if x is on a phase boundary
+        var phase = phase_func(x);
+        y[0] = x[0];
+        y[1] = x[1];
+        y[2] = x[2];
+outer_loop:
+        for(var d=0; d<3; ++d) {
+          for(var s=-1; s<=1; s+=2) {
+            y[d] += s;
+            if(phase !== phase_func(y)) {
+              builder.push(x[0], x[1], x[2], core.saturateAbs(dist_func(x)), phase);
+              break outer_loop;
+            }
+            y[d] = x[d];
+          }
+        }
+      }
+    }
+  }
+  return builder;
 }
+exports.dense = sampleDense;
 
-function index(x) {
-  return x.join("|");
-}
+
+//Index calculation
+var index = new Function("x", "return x.join('|');");
 
 //Fast marching methods for level set extraction
 function sampleMarching(lo, hi, seed_points, phase_func, dist_func) {
@@ -80,11 +110,7 @@ e_loop:
   }
   return new core.DynamicVolume([X,Y,Z], D, P);
 }
-exports.sampleMarching = sampleMarching;
-
-exports.sampleSolidMarching = function(lo, hi, seeds, dist_func) {
-  return sampleMarching(lo, hi, seeds, makeSolid(dist_func), dist_func);
-}
+exports.marching = sampleMarching;
 
 function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
   if(!(step instanceof Array)) {
@@ -123,8 +149,22 @@ function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
   console.log(crossings);
   return sampleMarching(lo, hi, crossings, phase_func, dist_func);
 }
-exports.sampleAdaptive = sampleAdaptive;
+exports.adaptive = sampleAdaptive;
 
-exports.sampleSolidAdaptive = function(lo, hi, step, dist_func) {
-  return sampleAdaptive(lo, hi, step, makeSolid(dist_func), dist_func);
+
+//Samplers for solid objects
+var inSolid = new Function("dist_func", "x", "return dist_func(x) <= 0 ? 1 : 0;");
+function makeSolid(dist_func) {
+  return inSolid.bind(null, dist_func);
 }
+exports.solid = {
+  dense: function(lo, hi, dist_func) {
+    return sampleDensoe(lo, hi, makeSolid(dist_func), dist_func);
+  },
+  marching: function(lo, hi, seeds, dist_func) {
+    return sampleMarching(lo, hi, seeds, makeSolid(dist_func), dist_func);
+  },
+  adaptive: function(lo, hi, step, dist_func) {
+    return sampleAdaptive(lo, hi, step, makeSolid(dist_func), dist_func);
+  }
+};
