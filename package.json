@@ -1,7 +1,7 @@
 {
-  "name": "rle-marching",
+  "name": "rle-sample",
   "version": "0.0.0",
-  "description": "Fast marching methods for sampling narrowband level sets",
+  "description": "Methods for sampling narrowband level sets",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -19,6 +19,8 @@
   },
   "keywords": [
     "rle",
+    "sample",
+    "dense",
     "narrowband",
     "marching",
     "sampling",

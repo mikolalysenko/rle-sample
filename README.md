@@ -29,7 +29,6 @@ Multiphase Samplers
 Signed Distance Samplers
 ========================
 
-
 `sample.solid.dense(lo, hi, sdist_func)`
 ----------------------------------------
 
