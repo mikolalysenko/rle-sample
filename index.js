@@ -62,7 +62,6 @@ e_loop:
   }
   //Convert result to a dynamic volume
   to_visit.sort(core.compareCoord);
-  console.log(to_visit);
   var X = new Array(to_visit.length+1);
   var Y = new Array(to_visit.length+1);
   var Z = new Array(to_visit.length+1);
@@ -121,6 +120,7 @@ function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
       }
     }
   }
+  console.log(crossings);
   return sampleMarching(lo, hi, crossings, phase_func, dist_func);
 }
 exports.sampleAdaptive = sampleAdaptive;
