@@ -55,11 +55,13 @@ Signed Distance Samplers
 These methods sample solid objects represented by signed distance fields.  They work basically the same as the multiphase samplers, except instead of taking a pair of functions for the phase and distance, they use only a single function input which represents the [signed distance](http://en.wikipedia.org/wiki/Signed_distance_function) to the boundary of a solid object.
 
 ### `sample.solid.dense(lo, hi, sdist_func)`
+Same as above for solids
 
 ### `sample.solid.marching(lo, hi, seeds, sdist_func)`
+Same as above for marching
 
 ### `sample.solid.adaptive(lo, hi, step, sdist_func)`
-
+Same as above for adaptive
 
 Credits
 =======
