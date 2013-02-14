@@ -49,10 +49,24 @@ function sampleMarching(lo, hi, seed_points, phase_func, dist_func) {
   dist_func = dist_func || DEFAULT_DIST_FUNC;
   var visited  = {};
   var to_visit = [];
+i_loop:
   for(var i=0; i<seed_points.length; ++i) {
     var x = seed_points[i];
-    to_visit.push([x[0], x[1], x[2], dist_func(x), phase_func(x)]);
-    visited[index(x)] = true;
+    var p = phase_func(x);
+    
+    for(var d=0; d<3; ++d) {
+      for(var s=-1; s<=2; s+=2) {
+        var t = x[d];
+        x[d] += s;
+        var np = phase_func(x);
+        x[d] = t;
+        if(np !== p) {
+          to_visit.push([x[0], x[1], x[2], dist_func(x), phase_func(x)]);
+          visited[index(x)] = true;
+          continue i_loop;
+        }
+      }
+    }
   }
   var x = [0,0,0];
   for(var n=0; n<to_visit.length; ++n) {
@@ -122,7 +136,6 @@ function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
   for(x[0]=lo[0]+step[0]; x[0]<hi[0]; x[0]+=step[0]) {
     for(x[1]=lo[1]+step[1]; x[1]<hi[1]; x[1]+=step[1]) {
       for(x[2]=lo[2]+step[2]; x[2]<hi[2]; x[2]+=step[2]) {
-        //Check crossing along 3 axes
         var p0 = phase_func(x);
         for(var d=0; d<3; ++d) {
           var old = x[d];
@@ -130,10 +143,10 @@ function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
           var p1 = phase_func(x[d]);
           if(p0 !== p1) {
             var l = x[d];
-            var h = x[d]+step;
+            var h = x[d]+step[d];
             while(l < h) {
-              x[d] = (l + h) >>> 1;
-              if(phase_func(x[d]) === p0) {
+              x[d] = (l + h) >> 1;
+              if(phase_func(x[d]) === p1) {
                 l = x[d] + 1;
               } else {
                 h = x[d] - 1;
@@ -146,7 +159,6 @@ function sampleAdaptive(lo, hi, step, phase_func, dist_func) {
       }
     }
   }
-  console.log(crossings);
   return sampleMarching(lo, hi, crossings, phase_func, dist_func);
 }
 exports.adaptive = sampleAdaptive;
@@ -159,7 +171,7 @@ function makeSolid(dist_func) {
 }
 exports.solid = {
   dense: function(lo, hi, dist_func) {
-    return sampleDensoe(lo, hi, makeSolid(dist_func), dist_func);
+    return sampleDense(lo, hi, makeSolid(dist_func), dist_func);
   },
   marching: function(lo, hi, seeds, dist_func) {
     return sampleMarching(lo, hi, seeds, makeSolid(dist_func), dist_func);

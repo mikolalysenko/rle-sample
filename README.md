@@ -1,6 +1,6 @@
 rle-sample
 ============
-Methods for sampling narrowband level sets.
+Methods for sampling narrowband level sets.  This is part of the [`rle` collection of libraries](https://github.com/mikolalysenko/rle-core) for narrowband level sets.
 
 Usage
 =====
